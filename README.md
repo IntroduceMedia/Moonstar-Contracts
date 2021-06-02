@@ -1,2 +1,7 @@
-# Moonstar-Contracts
-Moonstar Smart contracts
+# Moonstar NFT Marketplace Contract
+
+
+
+## License
+
+[MIT](LICENSE)
