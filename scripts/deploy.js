@@ -14,7 +14,7 @@ async function main () {
 
   let MoonstarAddress = '0x4AD910956D7E08cC9b2BB0e991c9998ee86DDB8d';
   let MoonstarNFTAddress = '';
-  let MoonstarFactoryAddress = '';
+  let MoonstarFactoryAddress = '0xD20F23178df6B74c164677d8964A7D579fcFCB10';
   let AdminAddress = '0xc2A79DdAF7e95C141C20aa1B10F3411540562FF7';
   /**
    *  Deploy Moonstar Token
@@ -68,7 +68,7 @@ async function main () {
   /**
    *  Deploy Moonstar Factory Proxy
    */
-  if(1) {
+  if(0) {
     const MoonstarFactory = await ethers.getContractFactory('MoonstarFactory', {
       signer: (await ethers.getSigners())[0]
     })
@@ -82,7 +82,7 @@ async function main () {
     MoonstarFactoryAddress = MoonstarFactoryContract.address;
   }
 
-  if(0) {
+  if(1) {
     const MoonstarFactoryV2 = await ethers.getContractFactory('MoonstarFactory', {
       signer: (await ethers.getSigners())[0]
     })

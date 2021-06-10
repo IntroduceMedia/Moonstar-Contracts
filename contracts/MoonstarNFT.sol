@@ -82,7 +82,7 @@ interface IWBNB {
 }
 
 interface IFactory {
-    function list(address creator, address owner, uint256 tokenId, bool currency,  uint256 price) external;
+    function list(address collection, address owner, uint256 tokenId, bool currency,  uint256 price) external;
 }
 
 contract MoonstarNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Whitelist {
@@ -149,7 +149,8 @@ contract MoonstarNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Whi
         _royalties[_tokenId] = _royaltiesPercent;
          
         if(_isListOnMarketplace) {
-            IFactory(factory).list(msg.sender, _toAddress, _tokenId, _currency, _price);
+            _approve(factory, _tokenId);
+            IFactory(factory).list(address(this), msg.sender, _tokenId, _currency, _price);
         }
 
         emit Minted(_toAddress, _currency,  _price, _tokenId, _tokenURI, _isListOnMarketplace, _royaltiesPercent);

@@ -106,13 +106,13 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
 		emit CollectionCreated(collection, msg.sender, _name, _symbol);
 	}
 
-    function list(address _collection, uint256 _token_id, bool _currency,  uint256 _price) public {
+    function list(address _collection, address owner, uint256 _token_id, bool _currency,  uint256 _price) public {
         require(_price > 0, "invalid price");
 		
         bytes32 key = itemKeyFromId(_collection, _token_id);
         require(!items[key].bValid, "already exist");
 
-        IMoonstarNFT(_collection).safeTransferFrom(msg.sender, address(this), _token_id, "List");
+        IMoonstarNFT(_collection).safeTransferFrom(owner, address(this), _token_id, "List");
 
         address creator = IMoonstarNFT(_collection).creatorOf(_token_id);
         uint256 royalties = IMoonstarNFT(_collection).royalties(_token_id);
@@ -120,13 +120,13 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
         items[key].collection = _collection;
         items[key].token_id = _token_id;
         items[key].creator = creator;
-        items[key].owner = msg.sender;
+        items[key].owner = owner;
         items[key].price = _price;
         items[key].currency = _currency;
         items[key].royalties = royalties;
         items[key].bValid = true;
 
-        emit Listed(key, _collection, _token_id, _price, _currency, creator, msg.sender, royalties);
+        emit Listed(key, _collection, _token_id, _price, _currency, creator, owner, royalties);
     }
 
     function delist(address _collection, uint256 _token_id) public returns (bool) {
@@ -167,7 +167,7 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
             if(_royalties > 0) require(IBEP20(paymentTokenAddress).transferFrom(_newOwner, _creator, _royalties));
         }
 
-        IMoonstarNFT(item.collection).safeTransferFrom(_previousOwner, _newOwner, item.token_id, "Purchase Item");
+        IMoonstarNFT(item.collection).safeTransferFrom(address(this), _newOwner, item.token_id, "Purchase Item");
         
         item.bValid = false;
 
