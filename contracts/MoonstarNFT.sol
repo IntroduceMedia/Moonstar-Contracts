@@ -34,7 +34,6 @@ contract Whitelist is Ownable {
    */
     function addToWhitelist(address _newAddress) public onlyOwner {
         _whitelist(_newAddress);
-        emit AddToWhitelist(_newAddress);
     }
 
     /**
@@ -43,7 +42,6 @@ contract Whitelist is Ownable {
    */
     function removeFromWhitelist(address _removedAddress) public onlyOwner {
         _unWhitelist(_removedAddress);
-        emit RemoveFromWhitelist(_removedAddress);
     }
 
     /**
@@ -65,6 +63,7 @@ contract Whitelist is Ownable {
    */
     function _unWhitelist(address _removedAddress) internal {
         whitelistMap[_removedAddress] = false;
+        emit RemoveFromWhitelist(_removedAddress);
     }
 
     /**
@@ -73,6 +72,7 @@ contract Whitelist is Ownable {
    */
     function _whitelist(address _newAddress) internal {
         whitelistMap[_newAddress] = true;
+        emit AddToWhitelist(_newAddress);
     }
 }
 
@@ -158,8 +158,9 @@ contract MoonstarNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Whi
         return _tokenId;
     }
 
-    function burn(uint _tokenId) external onlyOwner returns (bool)  {
+    function burn(uint _tokenId) external returns (bool)  {
         require(_exists(_tokenId), "Token ID is invalid");
+        require(ERC721.ownerOf(_tokenId) == msg.sender, "only owner can burn");
         _burn(_tokenId);
         emit Burned(_tokenId);
         return true;
