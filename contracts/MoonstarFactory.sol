@@ -5,7 +5,9 @@ pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "./MoonstarNFT.sol";
@@ -21,14 +23,21 @@ interface IMoonstarNFT {
 	function royalties(uint256 _tokenId) external view returns (uint256);        
 }
 
+interface IWETH {
+    function deposit() external payable;
+    function withdraw(uint wad) external;
 
-contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpgradeable {
+    function transfer(address to, uint256 value) external returns (bool);
+}
+
+contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
     using SafeMath for uint256;
+    using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 constant public PERCENTS_DIVIDER = 1000;
 	uint256 constant public FEE_MAX_PERCENT = 300;
 
-    address public  paymentTokenAddress; //payment token (ERC20), MST
+    EnumerableSet.AddressSet private _supportedTokens; //payment token (ERC20), MST
     // The address of the WBNB contract, so that BNB can be transferred via
     // WBNB if native BNB transfers fail.
     address public WBNBAddress;
@@ -44,7 +53,7 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
 		address creator;
 		address owner;
 		uint256 price;
-		bool currency;
+		address currency;
 		uint256 royalties;
 		bool bValid;
 	}
@@ -56,15 +65,17 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
     mapping(bytes32 => Item) public items;
 
     event CollectionCreated(address collection_address, address owner, string name, string symbol);
-    event Listed(bytes32 key, address collection, uint256 token_id, uint256 price, bool currency, address creator, address owner, uint256 royalties);
+    event Listed(bytes32 key, address collection, uint256 token_id, uint256 price, address currency, address creator, address owner, uint256 royalties);
     event Purchase(address indexed previousOwner, address indexed newOwner, bytes32 key, address collection, uint256 token_id);
-    event PriceUpdate(address indexed owner, uint256 oldPrice, uint256 newPrice, bytes32 key, address collection, uint256 token_id);
+    event PriceUpdate(address indexed owner, uint256 oldPrice, uint256 newPrice, address currency, bytes32 key, address collection, uint256 token_id);
     event Delisted(address indexed owner, uint256 token_id, address collection, bytes32 key);
    
     function initialize(address _paymenToken, address _feeAddress) public initializer {
 		__Ownable_init();
 	
-        paymentTokenAddress = _paymenToken;
+        _supportedTokens.add(address(0x0)); // BNB Support
+        _supportedTokens.add(_paymenToken);
+
         feeAddress = _feeAddress;
         WBNBAddress = 0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd;
 
@@ -76,9 +87,24 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
 	function _authorizeUpgrade(address newImplementation) internal override {}
     
 
-    function setPaymentToken(address _address) external onlyOwner {
-        require(_address != address(0x0), "invalid address");
-		paymentTokenAddress = _address;
+    function addSupportedToken(address _address) external onlyOwner {
+		_supportedTokens.add(_address);
+    }
+
+    function isSupportedToken(address _address) public view returns (bool) {
+        return _supportedTokens.contains(_address);
+    }
+
+    function removeSupportedToken(address _address) external onlyOwner {
+        _supportedTokens.remove(_address);
+    }
+
+    function supportedTokenAt(uint index) public view returns(address) {
+        return _supportedTokens.at(index);
+    }
+
+    function supportedTokensLength() public view returns(uint) {
+        return _supportedTokens.length();
     }
 
     function setFeeAddress(address _address) external onlyOwner {
@@ -106,8 +132,9 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
 		emit CollectionCreated(collection, msg.sender, _name, _symbol);
 	}
 
-    function list(address _collection, address owner, uint256 _token_id, bool _currency,  uint256 _price) public {
+    function list(address _collection, address owner, uint256 _token_id, address _currency,  uint256 _price) public {
         require(_price > 0, "invalid price");
+        require(isSupportedToken(_currency), "unsupported currency");
 		
         bytes32 key = itemKeyFromId(_collection, _token_id);
         require(!items[key].bValid, "already exist");
@@ -143,7 +170,7 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
         return true;
     }
 
-    function buy(address _collection, uint256 _token_id) external payable {
+    function buy(address _collection, uint256 _token_id) external payable nonReentrant {
         bytes32 _key = itemKeyFromId(_collection, _token_id);
         require(items[_key].bValid, "invalid pair");
 
@@ -157,14 +184,14 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
         uint256 _royalties = (item.price.sub(_commissionValue)).mul(item.royalties).div(PERCENTS_DIVIDER);
         uint256 _sellerValue = item.price.sub(_commissionValue).sub(_royalties);
 
-        if (item.currency) {
-            transferBNBOrWBNB(_previousOwner, _sellerValue);
-            if(_commissionValue > 0) transferBNBOrWBNB(feeAddress, _commissionValue);
-            if(_royalties > 0) transferBNBOrWBNB(_creator, _royalties);
+        if (item.currency == address(0x0)) {
+            _safeTransferBNB(_previousOwner, _sellerValue);
+            if(_commissionValue > 0) _safeTransferBNB(feeAddress, _commissionValue);
+            if(_royalties > 0) _safeTransferBNB(_creator, _royalties);
         } else {
-            require(IBEP20(paymentTokenAddress).transferFrom(_newOwner, _previousOwner, _sellerValue));
-            if(_commissionValue > 0) require(IBEP20(paymentTokenAddress).transferFrom(_newOwner, feeAddress, _commissionValue));
-            if(_royalties > 0) require(IBEP20(paymentTokenAddress).transferFrom(_newOwner, _creator, _royalties));
+            require(IBEP20(item.currency).transferFrom(_newOwner, _previousOwner, _sellerValue));
+            if(_commissionValue > 0) require(IBEP20(item.currency).transferFrom(_newOwner, feeAddress, _commissionValue));
+            if(_royalties > 0) require(IBEP20(item.currency).transferFrom(_newOwner, _creator, _royalties));
         }
 
         IMoonstarNFT(item.collection).safeTransferFrom(address(this), _newOwner, item.token_id, "Purchase Item");
@@ -174,17 +201,19 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
         emit Purchase(_previousOwner, _newOwner, _key, item.collection, item.token_id);
     }
     
-    function updatePrice(address _collection, uint256 _token_id, uint256 _price) public returns (bool) {
+    function updatePrice(address _collection, uint256 _token_id, address _currency, uint256 _price) public returns (bool) {
         bytes32 _key = itemKeyFromId(_collection, _token_id);
         Item storage item = items[_key];
 
         require(item.bValid, "invalid Item");
+        require(isSupportedToken(_currency), "unsupported currency");
         require(msg.sender == item.owner, "Error, you are not the owner");
 
         uint256 oldPrice = item.price;
         item.price = _price;
+        item.currency = _currency;
 
-        emit PriceUpdate(msg.sender, oldPrice, _price, _key, _collection, _token_id);
+        emit PriceUpdate(msg.sender, oldPrice, _price, _currency, _key, _collection, _token_id);
         return true;
     }
 
@@ -192,32 +221,16 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
         return keccak256(abi.encode(_collection, _token_id));
     }
 
-    // Will attempt to transfer BNB, but will transfer WBNB instead if it fails.
-    function transferBNBOrWBNB(address to, uint256 value) private {
-        // Try to transfer BNB to the given recipient.
-        if (!attemptBNBTransfer(to, value)) {
-            // If the transfer fails, wrap and send as WBNB, so that
-            // the auction is not impeded and the recipient still
-            // can claim BNB via the WBNB contract (similar to escrow).
-            IWBNB(WBNBAddress).deposit{value: value}();
-            IWBNB(WBNBAddress).transfer(to, value);
-            // At this point, the recipient can unwrap WBNB.
-        }
+
+    function _safeTransferBNB(address to, uint256 value) internal returns(bool) {
+		(bool success, ) = to.call{value: value}(new bytes(0));
+		if(!success) {
+			IWETH(WBNBAddress).deposit{value: value}();
+			return IWETH(WBNBAddress).transfer(to, value);
+		}
+		return success;
+        
     }
 
-    // Sending BNB is not guaranteed complete, and the mBNBod used here will return false if
-    // it fails. For example, a contract can block BNB transfer, or might use
-    // an excessive amount of gas, thereby griefing a new bidder.
-    // We should limit the gas used in transfers, and handle failure cases.
-    function attemptBNBTransfer(address to, uint256 value)
-        private
-        returns (bool)
-    {
-        // Here increase the gas limit a reasonable amount above the default, and try
-        // to send BNB to the recipient.
-        // NOTE: This might allow the recipient to attempt a limited reentrancy attack.
-        (bool success, ) = to.call{value: value, gas: 30000}("");
-        return success;
-    }
     receive() external payable {}
 }

@@ -68,7 +68,7 @@ async function main () {
   /**
    *  Deploy Moonstar Factory Proxy
    */
-  if(0) {
+  if(1) {
     const MoonstarFactory = await ethers.getContractFactory('MoonstarFactory', {
       signer: (await ethers.getSigners())[0]
     })
@@ -82,7 +82,7 @@ async function main () {
     MoonstarFactoryAddress = MoonstarFactoryContract.address;
   }
 
-  if(1) {
+  if(0) {
     const MoonstarFactoryV2 = await ethers.getContractFactory('MoonstarFactory', {
       signer: (await ethers.getSigners())[0]
     })
