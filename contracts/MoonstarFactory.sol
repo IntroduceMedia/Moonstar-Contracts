@@ -84,7 +84,7 @@ contract MoonstarFactory is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableUpg
 		createCollection("MoonstarNFT", "MOONNFT");
     }
 
-	function _authorizeUpgrade(address newImplementation) internal override {}
+	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
     
 
     function addSupportedToken(address _address) external onlyOwner {

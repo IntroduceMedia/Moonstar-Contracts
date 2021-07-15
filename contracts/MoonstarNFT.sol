@@ -82,7 +82,8 @@ interface IWBNB {
 }
 
 interface IFactory {
-    function list(address collection, address owner, uint256 tokenId, bool currency,  uint256 price) external;
+    function list(address collection, address owner, uint256 tokenId, address currency,  uint256 price) external;
+    function isSupportedToken(address _address) external view returns(bool);
 }
 
 contract MoonstarNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Whitelist {
@@ -97,7 +98,7 @@ contract MoonstarNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Whi
     mapping(uint256 => address) private _creators;
 
 
-    event Minted(address indexed minter, bool currency, uint256 price, uint nftID, string uri, bool status, uint256 royalties);
+    event Minted(address indexed minter, address currency, uint256 price, uint nftID, string uri, bool status, uint256 royalties);
     event Burned(uint nftID);
      
     constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_)  {
@@ -136,8 +137,9 @@ contract MoonstarNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, Whi
     }
 
     
-    function mint(string memory _tokenURI, address _toAddress, bool _currency,  uint256 _price, bool _isListOnMarketplace, uint256 _royaltiesPercent) public returns (uint) {
+    function mint(string memory _tokenURI, address _toAddress, address _currency,  uint256 _price, bool _isListOnMarketplace, uint256 _royaltiesPercent) public returns (uint) {
         require(isWhitelisted(msg.sender), "must be whitelisted to create tokens");
+        require(IFactory(factory).isSupportedToken(_currency), "unsupported currency");
         require(_royaltiesPercent < FEE_MAX_PERCENT, "too big royalties");
         
         uint _tokenId = totalSupply() + 1;

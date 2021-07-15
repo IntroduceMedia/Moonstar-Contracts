@@ -2,20 +2,25 @@
   "manifestVersion": "3.2",
   "proxies": [
     {
-      "address": "0xD20F23178df6B74c164677d8964A7D579fcFCB10",
-      "txHash": "0xa781d812772fa7d99cc282c2069ca02605e3638c38a5504c33708069ab042eaa",
+      "address": "0x31861414677baa29C93fA81dbf38a9a4EEe55E0C",
+      "txHash": "0x59ec485bf471a4d9836b64f740b590643098bb7904798bdddc29fb5787d0d883",
       "kind": "uups"
     },
     {
-      "address": "0x2F70BE9829e6f7755D5eC13070692D2f9E5f9Dbb",
-      "txHash": "0xde13c917b6316c04188f6264b6fa1ca7fac3b78a1e803ed66c28c44e7b6e4bce",
+      "address": "0x953a9B382cd89b352Ba6ab4012EB3e2A30725D13",
+      "txHash": "0x393753d60896ebff1f254176eed6e29bc98e97e6b2460d3bdfe579bd5f6576c8",
+      "kind": "uups"
+    },
+    {
+      "address": "0x77059F9827DD18d6930Effc14442cED9774F1777",
+      "txHash": "0x03abb8330e080adabf92b694e3beeaaf290e7379c8c4edf1a4954385c81e7a00",
       "kind": "uups"
     }
   ],
   "impls": {
-    "5c7a785bab80e4d74b895cbcf1317788b4ed59996593a7c8fe447dbb77cd8390": {
-      "address": "0x43357b329c9F7E6E7ae494889f88Ad7ffFdc8F00",
-      "txHash": "0x84842a01653709da30bede658c74c38e82d2d70e43499c621d734476a873ae0c",
+    "51b95cf5b09104f360f551c2c840f8c0b8114c129db4c28209a941be486eb0f7": {
+      "address": "0x601f1E68Fd9887bD86DC93c264a46bDE63D6D99a",
+      "txHash": "0x0adb342f145d4bdafc84bdf4024ddbc395724496876da73de6e1e7a5e797cb07",
       "layout": {
         "storage": [
           {
@@ -67,80 +72,130 @@
             "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "paymentTokenAddress",
-            "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:31"
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
           },
           {
-            "contract": "MoonstarFactory",
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "MoonstarAuctionV1",
+            "label": "_supportedTokens",
+            "type": "t_struct(AddressSet)3988_storage",
+            "src": "contracts\\MoonstarAuctionV1.sol:41"
+          },
+          {
+            "contract": "MoonstarAuctionV1",
             "label": "WBNBAddress",
             "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:34"
+            "src": "contracts\\MoonstarAuctionV1.sol:44"
           },
           {
-            "contract": "MoonstarFactory",
+            "contract": "MoonstarAuctionV1",
             "label": "tradingFee",
             "type": "t_uint256",
-            "src": "contracts\\MoonstarFactory.sol:36"
+            "src": "contracts\\MoonstarAuctionV1.sol:46"
           },
           {
-            "contract": "MoonstarFactory",
+            "contract": "MoonstarAuctionV1",
             "label": "feeAddress",
             "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:37"
+            "src": "contracts\\MoonstarAuctionV1.sol:47"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "collections",
-            "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\MoonstarFactory.sol:52"
+            "contract": "MoonstarAuctionV1",
+            "label": "auctions",
+            "type": "t_array(t_struct(Auction)4435_storage)dyn_storage",
+            "src": "contracts\\MoonstarAuctionV1.sol:71"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "collectionCreators",
-            "type": "t_mapping(t_address,t_address)",
-            "src": "contracts\\MoonstarFactory.sol:54"
+            "contract": "MoonstarAuctionV1",
+            "label": "auctionBids",
+            "type": "t_mapping(t_uint256,t_array(t_struct(Bid)4414_storage)dyn_storage)",
+            "src": "contracts\\MoonstarAuctionV1.sol:74"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "items",
-            "type": "t_mapping(t_bytes32,t_struct(Item)3747_storage)",
-            "src": "contracts\\MoonstarFactory.sol:56"
+            "contract": "MoonstarAuctionV1",
+            "label": "ownedAuctions",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "src": "contracts\\MoonstarAuctionV1.sol:77"
           }
         ],
         "types": {
-          "t_address": {
-            "label": "address"
+          "t_struct(AddressSet)3988_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)3713_storage"
+              }
+            ]
           },
-          "t_uint256": {
-            "label": "uint256"
+          "t_struct(Set)3713_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
           },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_mapping(t_address,t_address)": {
-            "label": "mapping(address => address)"
-          },
-          "t_mapping(t_bytes32,t_struct(Item)3747_storage)": {
-            "label": "mapping(bytes32 => struct MoonstarFactory.Item)"
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
           },
           "t_bytes32": {
             "label": "bytes32"
           },
-          "t_struct(Item)3747_storage": {
-            "label": "struct MoonstarFactory.Item",
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_struct(Auction)4435_storage)dyn_storage": {
+            "label": "struct MoonstarAuctionV1.Auction[]"
+          },
+          "t_struct(Auction)4435_storage": {
+            "label": "struct MoonstarAuctionV1.Auction",
             "members": [
               {
-                "label": "collection",
+                "label": "collectionId",
                 "type": "t_address"
               },
               {
-                "label": "token_id",
+                "label": "tokenId",
                 "type": "t_uint256"
               },
               {
-                "label": "creator",
+                "label": "isUnlimitied",
+                "type": "t_bool"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "startPrice",
+                "type": "t_uint256"
+              },
+              {
+                "label": "currency",
                 "type": "t_address"
               },
               {
@@ -148,25 +203,45 @@
                 "type": "t_address"
               },
               {
-                "label": "price",
-                "type": "t_uint256"
-              },
-              {
-                "label": "currency",
+                "label": "active",
                 "type": "t_bool"
               },
               {
-                "label": "royalties",
-                "type": "t_uint256"
-              },
-              {
-                "label": "bValid",
+                "label": "finalized",
                 "type": "t_bool"
               }
             ]
           },
           "t_bool": {
             "label": "bool"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(Bid)4414_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct MoonstarAuctionV1.Bid[])"
+          },
+          "t_array(t_struct(Bid)4414_storage)dyn_storage": {
+            "label": "struct MoonstarAuctionV1.Bid[]"
+          },
+          "t_struct(Bid)4414_storage": {
+            "label": "struct MoonstarAuctionV1.Bid",
+            "members": [
+              {
+                "label": "from",
+                "type": "t_address_payable"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
@@ -177,9 +252,9 @@
         }
       }
     },
-    "4ec3c16b44c5c816d4f68051824b555836ffdcae02aa873dc0a826f605661230": {
-      "address": "0x39cfbC676b9d995e420b7aEdc5B8D4946E678139",
-      "txHash": "0xe6f1577dd57cd1a4d59f204a91e6709658428157d9bb2857bb285b75277f52ea",
+    "035977340ae6a3671138fe07c5a7a507c649bf62c641278be49419df2e401aad": {
+      "address": "0xd878E8cE39033f06285a549e24a3b5e1909CEB2D",
+      "txHash": "0x81d16fb7ec315a81329354af7031455044e6a48625a7dacd37dd71f371114a77",
       "layout": {
         "storage": [
           {
@@ -231,80 +306,130 @@
             "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "paymentTokenAddress",
-            "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:31"
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
           },
           {
-            "contract": "MoonstarFactory",
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "MoonstarAuctionV1",
+            "label": "_supportedTokens",
+            "type": "t_struct(AddressSet)3988_storage",
+            "src": "contracts\\MoonstarAuctionV1.sol:41"
+          },
+          {
+            "contract": "MoonstarAuctionV1",
             "label": "WBNBAddress",
             "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:34"
+            "src": "contracts\\MoonstarAuctionV1.sol:44"
           },
           {
-            "contract": "MoonstarFactory",
+            "contract": "MoonstarAuctionV1",
             "label": "tradingFee",
             "type": "t_uint256",
-            "src": "contracts\\MoonstarFactory.sol:36"
+            "src": "contracts\\MoonstarAuctionV1.sol:46"
           },
           {
-            "contract": "MoonstarFactory",
+            "contract": "MoonstarAuctionV1",
             "label": "feeAddress",
             "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:37"
+            "src": "contracts\\MoonstarAuctionV1.sol:47"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "collections",
-            "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\MoonstarFactory.sol:52"
+            "contract": "MoonstarAuctionV1",
+            "label": "auctions",
+            "type": "t_array(t_struct(Auction)4435_storage)dyn_storage",
+            "src": "contracts\\MoonstarAuctionV1.sol:71"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "collectionCreators",
-            "type": "t_mapping(t_address,t_address)",
-            "src": "contracts\\MoonstarFactory.sol:54"
+            "contract": "MoonstarAuctionV1",
+            "label": "auctionBids",
+            "type": "t_mapping(t_uint256,t_array(t_struct(Bid)4414_storage)dyn_storage)",
+            "src": "contracts\\MoonstarAuctionV1.sol:74"
           },
           {
-            "contract": "MoonstarFactory",
-            "label": "items",
-            "type": "t_mapping(t_bytes32,t_struct(Item)3747_storage)",
-            "src": "contracts\\MoonstarFactory.sol:56"
+            "contract": "MoonstarAuctionV1",
+            "label": "ownedAuctions",
+            "type": "t_mapping(t_address,t_array(t_uint256)dyn_storage)",
+            "src": "contracts\\MoonstarAuctionV1.sol:77"
           }
         ],
         "types": {
-          "t_address": {
-            "label": "address"
+          "t_struct(AddressSet)3988_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)3713_storage"
+              }
+            ]
           },
-          "t_uint256": {
-            "label": "uint256"
+          "t_struct(Set)3713_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
           },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_mapping(t_address,t_address)": {
-            "label": "mapping(address => address)"
-          },
-          "t_mapping(t_bytes32,t_struct(Item)3747_storage)": {
-            "label": "mapping(bytes32 => struct MoonstarFactory.Item)"
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
           },
           "t_bytes32": {
             "label": "bytes32"
           },
-          "t_struct(Item)3747_storage": {
-            "label": "struct MoonstarFactory.Item",
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_array(t_struct(Auction)4435_storage)dyn_storage": {
+            "label": "struct MoonstarAuctionV1.Auction[]"
+          },
+          "t_struct(Auction)4435_storage": {
+            "label": "struct MoonstarAuctionV1.Auction",
             "members": [
               {
-                "label": "collection",
+                "label": "collectionId",
                 "type": "t_address"
               },
               {
-                "label": "token_id",
+                "label": "tokenId",
                 "type": "t_uint256"
               },
               {
-                "label": "creator",
+                "label": "isUnlimitied",
+                "type": "t_bool"
+              },
+              {
+                "label": "startTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "endTime",
+                "type": "t_uint256"
+              },
+              {
+                "label": "startPrice",
+                "type": "t_uint256"
+              },
+              {
+                "label": "currency",
                 "type": "t_address"
               },
               {
@@ -312,25 +437,45 @@
                 "type": "t_address"
               },
               {
-                "label": "price",
-                "type": "t_uint256"
-              },
-              {
-                "label": "currency",
+                "label": "active",
                 "type": "t_bool"
               },
               {
-                "label": "royalties",
-                "type": "t_uint256"
-              },
-              {
-                "label": "bValid",
+                "label": "finalized",
                 "type": "t_bool"
               }
             ]
           },
           "t_bool": {
             "label": "bool"
+          },
+          "t_mapping(t_uint256,t_array(t_struct(Bid)4414_storage)dyn_storage)": {
+            "label": "mapping(uint256 => struct MoonstarAuctionV1.Bid[])"
+          },
+          "t_array(t_struct(Bid)4414_storage)dyn_storage": {
+            "label": "struct MoonstarAuctionV1.Bid[]"
+          },
+          "t_struct(Bid)4414_storage": {
+            "label": "struct MoonstarAuctionV1.Bid",
+            "members": [
+              {
+                "label": "from",
+                "type": "t_address_payable"
+              },
+              {
+                "label": "amount",
+                "type": "t_uint256"
+              }
+            ]
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_mapping(t_address,t_array(t_uint256)dyn_storage)": {
+            "label": "mapping(address => uint256[])"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
@@ -341,9 +486,9 @@
         }
       }
     },
-    "a8dedf4ce75edd7906e02d9577ce1332960fc43da9fcbeddb278ac35336c99c3": {
-      "address": "0xeb431836FBCC25E5648C884748455BEa19ebCA2d",
-      "txHash": "0xd3802b54a61eb387f4417e9327dbd240c69e1a48cda99322686abdc1ffaa6865",
+    "e719962d98cf824a9e81791beff13b21aa5ec3a39073da660a23ce8fb61dcff9": {
+      "address": "0x0A297fc073d486F0298f339604B719531A9a6f13",
+      "txHash": "0xd6caf247580361b1e0bd81d2cec89cdbef8870b4ea6f08219c707174c3ce76bc",
       "layout": {
         "storage": [
           {
@@ -395,218 +540,97 @@
             "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
           },
           {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
             "contract": "MoonstarFactory",
-            "label": "paymentTokenAddress",
-            "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:31"
+            "label": "_supportedTokens",
+            "type": "t_struct(AddressSet)3988_storage",
+            "src": "contracts\\MoonstarFactory.sol:40"
           },
           {
             "contract": "MoonstarFactory",
             "label": "WBNBAddress",
             "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:34"
+            "src": "contracts\\MoonstarFactory.sol:43"
           },
           {
             "contract": "MoonstarFactory",
             "label": "tradingFee",
             "type": "t_uint256",
-            "src": "contracts\\MoonstarFactory.sol:36"
+            "src": "contracts\\MoonstarFactory.sol:45"
           },
           {
             "contract": "MoonstarFactory",
             "label": "feeAddress",
             "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:37"
+            "src": "contracts\\MoonstarFactory.sol:46"
           },
           {
             "contract": "MoonstarFactory",
             "label": "collections",
             "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\MoonstarFactory.sol:52"
+            "src": "contracts\\MoonstarFactory.sol:61"
           },
           {
             "contract": "MoonstarFactory",
             "label": "collectionCreators",
             "type": "t_mapping(t_address,t_address)",
-            "src": "contracts\\MoonstarFactory.sol:54"
+            "src": "contracts\\MoonstarFactory.sol:63"
           },
           {
             "contract": "MoonstarFactory",
             "label": "items",
-            "type": "t_mapping(t_bytes32,t_struct(Item)3747_storage)",
-            "src": "contracts\\MoonstarFactory.sol:56"
+            "type": "t_mapping(t_bytes32,t_struct(Item)5627_storage)",
+            "src": "contracts\\MoonstarFactory.sol:65"
           }
         ],
         "types": {
-          "t_address": {
-            "label": "address"
-          },
-          "t_uint256": {
-            "label": "uint256"
-          },
-          "t_array(t_address)dyn_storage": {
-            "label": "address[]"
-          },
-          "t_mapping(t_address,t_address)": {
-            "label": "mapping(address => address)"
-          },
-          "t_mapping(t_bytes32,t_struct(Item)3747_storage)": {
-            "label": "mapping(bytes32 => struct MoonstarFactory.Item)"
-          },
-          "t_bytes32": {
-            "label": "bytes32"
-          },
-          "t_struct(Item)3747_storage": {
-            "label": "struct MoonstarFactory.Item",
+          "t_struct(AddressSet)3988_storage": {
+            "label": "struct EnumerableSet.AddressSet",
             "members": [
               {
-                "label": "collection",
-                "type": "t_address"
-              },
-              {
-                "label": "token_id",
-                "type": "t_uint256"
-              },
-              {
-                "label": "creator",
-                "type": "t_address"
-              },
-              {
-                "label": "owner",
-                "type": "t_address"
-              },
-              {
-                "label": "price",
-                "type": "t_uint256"
-              },
-              {
-                "label": "currency",
-                "type": "t_bool"
-              },
-              {
-                "label": "royalties",
-                "type": "t_uint256"
-              },
-              {
-                "label": "bValid",
-                "type": "t_bool"
+                "label": "_inner",
+                "type": "t_struct(Set)3713_storage"
               }
             ]
           },
-          "t_bool": {
-            "label": "bool"
+          "t_struct(Set)3713_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
           },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]"
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
           },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]"
-          }
-        }
-      }
-    },
-    "9acf65701804032864ddf5d8ebeaf55d276fd4b5a964f63e321529b8cf0b095f": {
-      "address": "0xa474062C410564AF24300cd5bbdDdc93eEc8F4A2",
-      "txHash": "0x7528cff03ba68234906ec462e9ad1a644ef5abf256a8f129447b24560ccb0937",
-      "layout": {
-        "storage": [
-          {
-            "contract": "Initializable",
-            "label": "_initialized",
-            "type": "t_bool",
-            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          "t_bytes32": {
+            "label": "bytes32"
           },
-          {
-            "contract": "Initializable",
-            "label": "_initializing",
-            "type": "t_bool",
-            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
-          },
-          {
-            "contract": "ERC1967UpgradeUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\ERC1967\\ERC1967UpgradeUpgradeable.sol:229"
-          },
-          {
-            "contract": "UUPSUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\UUPSUpgradeable.sol:36"
-          },
-          {
-            "contract": "ERC721HolderUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin\\contracts-upgradeable\\token\\ERC721\\utils\\ERC721HolderUpgradeable.sol:30"
-          },
-          {
-            "contract": "ContextUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)50_storage",
-            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "_owner",
-            "type": "t_address",
-            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
-          },
-          {
-            "contract": "OwnableUpgradeable",
-            "label": "__gap",
-            "type": "t_array(t_uint256)49_storage",
-            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "paymentTokenAddress",
-            "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:31"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "WBNBAddress",
-            "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:34"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "tradingFee",
-            "type": "t_uint256",
-            "src": "contracts\\MoonstarFactory.sol:36"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "feeAddress",
-            "type": "t_address",
-            "src": "contracts\\MoonstarFactory.sol:37"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "collections",
-            "type": "t_array(t_address)dyn_storage",
-            "src": "contracts\\MoonstarFactory.sol:52"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "collectionCreators",
-            "type": "t_mapping(t_address,t_address)",
-            "src": "contracts\\MoonstarFactory.sol:54"
-          },
-          {
-            "contract": "MoonstarFactory",
-            "label": "items",
-            "type": "t_mapping(t_bytes32,t_struct(Item)3747_storage)",
-            "src": "contracts\\MoonstarFactory.sol:56"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address"
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
           },
           "t_uint256": {
             "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
           },
           "t_array(t_address)dyn_storage": {
             "label": "address[]"
@@ -614,13 +638,10 @@
           "t_mapping(t_address,t_address)": {
             "label": "mapping(address => address)"
           },
-          "t_mapping(t_bytes32,t_struct(Item)3747_storage)": {
+          "t_mapping(t_bytes32,t_struct(Item)5627_storage)": {
             "label": "mapping(bytes32 => struct MoonstarFactory.Item)"
           },
-          "t_bytes32": {
-            "label": "bytes32"
-          },
-          "t_struct(Item)3747_storage": {
+          "t_struct(Item)5627_storage": {
             "label": "struct MoonstarFactory.Item",
             "members": [
               {
@@ -645,7 +666,7 @@
               },
               {
                 "label": "currency",
-                "type": "t_bool"
+                "type": "t_address"
               },
               {
                 "label": "royalties",

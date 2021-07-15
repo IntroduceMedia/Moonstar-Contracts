@@ -58,6 +58,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         address collectionId;
         uint256 tokenId;
         bool isUnlimitied;
+        uint256 startTime;
         uint256 endTime;
         uint256 startPrice;
         address currency;
@@ -75,10 +76,10 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
     // Mapping from owner to a list of owned auctions
     mapping (address => uint[]) public ownedAuctions;
     
-    event BidSuccess(address _from, uint _auctionId);
+    event BidSuccess(address _from, uint _auctionId, uint _amount);
 
     // AuctionCreated is fired when an auction is created
-    event AuctionCreated(address _owner, uint _auctionId);
+    event AuctionCreated(address _owner, address _collectionId, uint _tokenId, uint _auctionId);
 
     // AuctionCanceled is fired when an auction is canceled
     event AuctionCanceled(address _owner, uint _auctionId);
@@ -96,7 +97,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         WBNBAddress = 0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd;
     }
 
-	function _authorizeUpgrade(address newImplementation) internal override {}
+	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 
     function addSupportedToken(address _address) external onlyOwner {
 		_supportedTokens.add(_address);
@@ -140,6 +141,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         uint256 _tokenId,
         address _currency, 
         uint256 _startPrice, 
+        uint256 _startTime,
         uint256 _endTime,
         bool _isUnlimited
         ) 
@@ -152,6 +154,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         newAuction.tokenId = _tokenId;
         newAuction.startPrice = _startPrice;
         newAuction.currency = _currency;
+        newAuction.startTime = _startTime;
         newAuction.endTime = _endTime;
         newAuction.isUnlimitied = _isUnlimited;
         newAuction.owner = msg.sender;
@@ -161,7 +164,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         auctions.push(newAuction);        
         ownedAuctions[msg.sender].push(auctionId);
         
-        emit AuctionCreated(msg.sender, auctionId);
+        emit AuctionCreated(msg.sender, _collectionId, _tokenId,  auctionId);
         return true;
     }
     
@@ -212,7 +215,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         uint bidsLength = auctionBids[_auctionId].length;
 
         // 1. if auction not ended just revert
-        require(!myAuction.isUnlimitied && block.timestamp >= myAuction.endTime, "auction is not ended");
+        require(myAuction.isUnlimitied || block.timestamp >= myAuction.endTime, "auction is not ended");
         require(msg.sender == myAuction.owner || msg.sender == owner(), "only auction owner can finalize");
         
         // if there are no bids cancel
@@ -260,7 +263,10 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         require(myAuction.owner != msg.sender, "owner can not bid");
 
         // if auction is expired
-        require(myAuction.isUnlimitied || block.timestamp < myAuction.endTime, "auction is over");
+        if(!myAuction.isUnlimitied) {
+            require(block.timestamp < myAuction.endTime, "auction is over");
+            require(block.timestamp >= myAuction.startTime, "auction is not started");
+        }
 
         uint bidsLength = auctionBids[_auctionId].length;
         uint256 tempAmount = myAuction.startPrice;
@@ -275,9 +281,9 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
 
         // check if amound is greater than previous amount  
         if(isBNBAuction(_auctionId)) {
-            require(msg.value >= tempAmount, "too small amount");
+            require(myAuction.isUnlimitied || msg.value >= tempAmount, "too small amount");
         } else {
-            require(amount >= tempAmount, "too small amount");
+            require(myAuction.isUnlimitied || amount >= tempAmount, "too small amount");
             require(IERC20(myAuction.currency).transferFrom(msg.sender, address(this), amount), "transfe to contract failed");
         }
         
@@ -297,7 +303,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         newBid.from = payable(msg.sender);
         newBid.amount = isBNBAuction(_auctionId) ? msg.value : amount;
         auctionBids[_auctionId].push(newBid);
-        emit BidSuccess(msg.sender, _auctionId);
+        emit BidSuccess(msg.sender, _auctionId, newBid.amount);
     }
 
     /**
@@ -362,7 +368,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
 
     modifier onlyTokenOwner(address _collectionId, uint256 _tokenId) {
         address tokenOwner = IERC721(_collectionId).ownerOf(_tokenId);
-        require(tokenOwner == address(this));
+        require(tokenOwner == msg.sender);
         _;
     }
 }

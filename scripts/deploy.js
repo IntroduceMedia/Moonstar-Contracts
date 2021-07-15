@@ -14,7 +14,8 @@ async function main () {
 
   let MoonstarAddress = '0x4AD910956D7E08cC9b2BB0e991c9998ee86DDB8d';
   let MoonstarNFTAddress = '';
-  let MoonstarFactoryAddress = '0xD20F23178df6B74c164677d8964A7D579fcFCB10';
+  let MoonstarFactoryAddress = '0x475fb1a622F9B18c7b6792dE884ccc367C1f04c6';
+  let MoonstarAuctionAddress = '0x31861414677baa29C93fA81dbf38a9a4EEe55E0C';
   let AdminAddress = '0xc2A79DdAF7e95C141C20aa1B10F3411540562FF7';
   /**
    *  Deploy Moonstar Token
@@ -68,7 +69,7 @@ async function main () {
   /**
    *  Deploy Moonstar Factory Proxy
    */
-  if(1) {
+  if(1){
     const MoonstarFactory = await ethers.getContractFactory('MoonstarFactory', {
       signer: (await ethers.getSigners())[0]
     })
@@ -95,45 +96,28 @@ async function main () {
   /**
    *  Deploy Moonstar Reserve Auction1
    */
+   if(1) {
+    const MoonstarAuction = await ethers.getContractFactory('MoonstarAuctionV1', {
+      signer: (await ethers.getSigners())[0]
+    })
+  
+    const MoonstarAuctionContract = await upgrades.deployProxy(MoonstarAuction, 
+      [MoonstarAddress, AdminAddress],
+      {initializer: 'initialize',kind: 'uups'});
+    await MoonstarAuctionContract.deployed()
+  
+    console.log('Moonstar Auction deployed to:', MoonstarAuctionContract.address)
+    MoonstarAuctionAddress = MoonstarAuctionContract.address;
+  }
+
   if(0) {
-    const ReserveAuction = await ethers.getContractFactory('ReserveAuction', {
+    const MoonstarAuctionV2 = await ethers.getContractFactory('MoonstarAuctionV1', {
       signer: (await ethers.getSigners())[0]
     })
   
-    const ReserveAuctionContract = await ReserveAuction.deploy(MoonstarNFTAddress, MoonstarAddress, AdminAddress);
-    await ReserveAuctionContract.deployed()
-  
-    console.log('ReserveAuctionContract deployed to:', ReserveAuctionContract.address)
-    
-    await sleep(60);
-    await hre.run("verify:verify", {
-      address: ReserveAuctionContract.address,
-      contract: "contracts/ReserveAuction.sol:ReserveAuction",
-      constructorArguments: [MoonstarNFTAddress, MoonstarAddress, AdminAddress],
-    })
-  
-    console.log('ReserveAuctionContract verified')
-  
-    /**
-     *  Deploy Moonstar Reserve Auction3
-     */
-     const ReserveAuctionV3 = await ethers.getContractFactory('ReserveAuctionV3', {
-      signer: (await ethers.getSigners())[0]
-    })
-  
-    const ReserveAuctionV3Contract = await ReserveAuctionV3.deploy(MoonstarNFTAddress, MoonstarAddress, AdminAddress);
-    await ReserveAuctionV3Contract.deployed()
-  
-    console.log('ReserveAuctionV3Contract deployed to:', ReserveAuctionV3Contract.address)
-    
-    await sleep(60);
-    await hre.run("verify:verify", {
-      address: ReserveAuctionV3Contract.address,
-      contract: "contracts/ReserveAuctionV3.sol:ReserveAuctionV3",
-      constructorArguments: [MoonstarNFTAddress, MoonstarAddress, AdminAddress],
-    })
-  
-    console.log('ReserveAuctionV3Contract verified')
+    await upgrades.upgradeProxy(MoonstarAuctionAddress, MoonstarAuctionV2);
+
+    console.log('Moonstar Auction V2 upgraded')
   }
 }
 
