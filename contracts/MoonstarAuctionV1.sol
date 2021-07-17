@@ -76,7 +76,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
     // Mapping from owner to a list of owned auctions
     mapping (address => uint[]) public ownedAuctions;
     
-    event BidSuccess(address _from, uint _auctionId, uint _amount);
+    event BidSuccess(address _from, uint _auctionId, uint _amount, uint _bidIndex);
 
     // AuctionCreated is fired when an auction is created
     event AuctionCreated(address _owner, address _collectionId, uint _tokenId, uint _auctionId);
@@ -164,15 +164,15 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         auctions.push(newAuction);        
         ownedAuctions[msg.sender].push(auctionId);
         
+        _safeTransferERC721(newAuction.owner, address(this), newAuction.collectionId, newAuction.tokenId);
+
         emit AuctionCreated(msg.sender, _collectionId, _tokenId,  auctionId);
         return true;
     }
     
-    function approveAndTransfer(address _from, address _to, address _collectionId, uint256 _tokenId) internal returns(bool) {
+    function _safeTransferERC721(address _from, address _to, address _collectionId, uint256 _tokenId) internal {
         IERC721 token = IERC721(_collectionId);
-        token.approve(_to, _tokenId);
-        token.transferFrom(_from, _to, _tokenId);
-        return true;
+        token.safeTransferFrom(_from, _to, _tokenId, "");
     }
 
     function _safeTransferBNB(address to, uint256 value) internal returns(bool) {
@@ -198,10 +198,10 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         require(bidsLength == 0, "bid already started");
 
         // approve and transfer from this contract to auction owner
-        if(approveAndTransfer(address(this), myAuction.owner, myAuction.collectionId, myAuction.tokenId)){
-            auctions[_auctionId].active = false;
-            emit AuctionCanceled(msg.sender, _auctionId);
-        }
+        _safeTransferERC721(address(this), myAuction.owner, myAuction.collectionId, myAuction.tokenId);
+
+        auctions[_auctionId].active = false;
+        emit AuctionCanceled(msg.sender, _auctionId);
     }
     
     /**
@@ -243,11 +243,10 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
             }
 
             // approve and transfer from this contract to the bid winner 
-            if(approveAndTransfer(address(this), lastBid.from, myAuction.collectionId, myAuction.tokenId)){
-                auctions[_auctionId].active = false;
-                auctions[_auctionId].finalized = true;
-                emit AuctionFinalized(msg.sender, _auctionId);
-            }
+            _safeTransferERC721(address(this), lastBid.from, myAuction.collectionId, myAuction.tokenId);
+            auctions[_auctionId].active = false;
+            auctions[_auctionId].finalized = true;
+            emit AuctionFinalized(msg.sender, _auctionId);
         }
     }
     
@@ -275,9 +274,9 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         // there are previous bids
         if( bidsLength > 0 ) {
             lastBid = auctionBids[_auctionId][bidsLength - 1];
-            tempAmount = lastBid.amount;
+            tempAmount = lastBid.amount.mul(PERCENTS_DIVIDER + MIN_BID_INCREMENT_PERCENT).div(PERCENTS_DIVIDER);
         }
-        tempAmount = tempAmount.mul(PERCENTS_DIVIDER + MIN_BID_INCREMENT_PERCENT).div(PERCENTS_DIVIDER);
+        
 
         // check if amound is greater than previous amount  
         if(isBNBAuction(_auctionId)) {
@@ -303,7 +302,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         newBid.from = payable(msg.sender);
         newBid.amount = isBNBAuction(_auctionId) ? msg.value : amount;
         auctionBids[_auctionId].push(newBid);
-        emit BidSuccess(msg.sender, _auctionId, newBid.amount);
+        emit BidSuccess(msg.sender, _auctionId, newBid.amount, bidsLength);
     }
 
     /**
