@@ -215,7 +215,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         uint bidsLength = auctionBids[_auctionId].length;
 
         // 1. if auction not ended just revert
-        require(myAuction.isUnlimitied || block.timestamp >= myAuction.endTime, "auction is not ended");
+        require(msg.sender == owner() || myAuction.isUnlimitied || block.timestamp >= myAuction.endTime, "auction is not ended");
         require(msg.sender == myAuction.owner || msg.sender == owner(), "only auction owner can finalize");
         
         // if there are no bids cancel
