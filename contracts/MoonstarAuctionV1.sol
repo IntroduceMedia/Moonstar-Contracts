@@ -94,7 +94,7 @@ contract MoonstarAuctionV1 is UUPSUpgradeable, ERC721HolderUpgradeable, OwnableU
         _supportedTokens.add(_paymenToken);
 
         feeAddress = _feeAddress;
-        WBNBAddress = 0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd;
+        WBNBAddress = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
     }
 
 	function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}

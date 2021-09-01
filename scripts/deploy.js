@@ -12,10 +12,10 @@ async function main () {
   console.log('signer:', await signer.getAddress())
 
 
-  let MoonstarAddress = '0x4AD910956D7E08cC9b2BB0e991c9998ee86DDB8d';
+  let MoonstarAddress = '0xce5814efff15d53efd8025b9f2006d4d7d640b9b';
   let MoonstarNFTAddress = '';
-  let MoonstarFactoryAddress = '0x475fb1a622F9B18c7b6792dE884ccc367C1f04c6';
-  let MoonstarAuctionAddress = '0xdD40dF4712BDF9c6FeFA9d0dD2AB7E90DeFb8273';
+  let MoonstarFactoryAddress = '';
+  let MoonstarAuctionAddress = '';
   let AdminAddress = '0xc2A79DdAF7e95C141C20aa1B10F3411540562FF7';
   /**
    *  Deploy Moonstar Token
@@ -49,7 +49,7 @@ async function main () {
       signer: (await ethers.getSigners())[0]
     })
   
-    const MoonstarNFTContract = await MoonstarNFT.deploy();
+    const MoonstarNFTContract = await MoonstarNFT.deploy('MoonstarNFT', 'MoonstarNFT');
     await MoonstarNFTContract.deployed()
   
     MoonstarNFTAddress = MoonstarNFTContract.address;
@@ -59,7 +59,7 @@ async function main () {
     await hre.run("verify:verify", {
       address: MoonstarNFTContract.address,
       contract: "contracts/MoonstarNFT.sol:MoonstarNFT",
-      constructorArguments: [],
+      constructorArguments: ['MoonstarNFT', 'MoonstarNFT'],
     })
   
     console.log('MoonstarNFTContract verified')
@@ -69,7 +69,7 @@ async function main () {
   /**
    *  Deploy Moonstar Factory Proxy
    */
-  if(0){
+  if(1){
     const MoonstarFactory = await ethers.getContractFactory('MoonstarFactory', {
       signer: (await ethers.getSigners())[0]
     })
@@ -96,7 +96,7 @@ async function main () {
   /**
    *  Deploy Moonstar Reserve Auction1
    */
-   if(0) {
+   if(1) {
     const MoonstarAuction = await ethers.getContractFactory('MoonstarAuctionV1', {
       signer: (await ethers.getSigners())[0]
     })
@@ -110,7 +110,7 @@ async function main () {
     MoonstarAuctionAddress = MoonstarAuctionContract.address;
   }
 
-  if(1) {
+  if(0) {
     const MoonstarAuctionV2 = await ethers.getContractFactory('MoonstarAuctionV1', {
       signer: (await ethers.getSigners())[0]
     })
